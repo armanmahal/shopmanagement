@@ -1,0 +1,1 @@
+1> hash the stored passwrod for admin access

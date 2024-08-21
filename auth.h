@@ -1,0 +1,162 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+
+using namespace std;
+
+class Admin
+{
+private:
+    string correctPassword; // correct password
+    string userPassword;    // password which user gave as input
+
+    string name, email;
+
+    string hashPass(string s)
+    {
+        unsigned long long int hash = 0;
+        for (char c : s)
+        {
+            hash = (hash * 31) + (unsigned long long int)c;
+        }
+
+        string ans = to_string(hash);
+        return ans;
+
+        /*
+         For each character c in the string, the hash value is updated by multiplying the current
+         hash value by a prime number (31 in this case) and adding the ASCII value of the
+         character.
+
+        *** Points to Consider ***
+
+        --> Collision Resistance:
+        This simple hash function is not designed to be collision-resistant. A good hash
+        function minimizes collisions, meaning different inputs should produce different hash
+        values as much as possible.
+
+        --> Uniform Distribution:
+         A well-designed hash function should distribute hash values uniformly to avoid
+         clustering.
+
+        --> Performance:
+        In practice, hash functions should be efficient and work well with large datasets.
+        */
+    }
+
+    void createUser()
+    {
+        textRed("\t\tNo Prior Admin Found.");
+        textGreen("\tEnter details below to become one:");
+        cout << "Name: ";
+        cin >> name;
+
+        cout << "Email: ";
+        cin >> email;
+
+        cout << "Create Password: ";
+        cin >> correctPassword;
+
+        // hashing password:
+        correctPassword = hashPass(correctPassword);
+
+        textGreen("Congrats!!! You became admin of this store.");
+        ScreenWaitMilliSec(800);
+    }
+
+public:
+
+    bool authenticate()
+    {
+        ifstream passkeyFile("db/auth.txt");
+        if (!passkeyFile)
+        {
+            // if file not found:
+
+            // create a new admin:
+            createUser();
+
+            // create a new file:
+            ofstream tempFile("db/auth.txt");
+            tempFile << "adminname:password:email:";
+
+            // enter new admin details in file:
+            tempFile << "\n"
+                     << name << ":" << correctPassword << ":" << email << ":";
+
+            // close the files and return:
+            tempFile.close();
+            passkeyFile.close();
+            return true;
+        }
+
+        // if admin file found
+
+        // getting admin Details:
+        string details = "";
+        getline(passkeyFile, details); // skip this line
+        getline(passkeyFile, details); // this line contains details.
+        // setting admin Details in variables:
+        int index = 0;
+
+        for (auto c : details)
+        {
+            if (c == ':')
+            {
+                index++;
+            }
+            else
+            {
+                if (index == 0)
+                {
+                    name += c;
+                }
+                if (index == 1)
+                {
+                    correctPassword += c;
+                }
+                if (index == 2)
+                {
+                    email += c;
+                }
+            }
+        }
+
+        // getting user input password:
+        cout << endl;
+        textGreen("Enter the Passkey for Admin: ", false);
+        cin >> userPassword;
+
+        // hashing user input password:
+        userPassword = hashPass(userPassword);
+
+        // if password entered is correct:
+        if (correctPassword == userPassword)
+        {
+            ScreenClear();
+            cout << endl;
+            textGreen("Success!");
+            textAnimate("Loading...", 60);
+            return true;
+        }
+        // else if not correct password:
+        else
+        {
+            textRed("Wrong Password!");
+            ScreenWaitMilliSec(600);
+            return false;
+        }
+    }
+
+    void displayDetails()
+    {
+        cout << "\t\tName: " << name << endl;
+        cout << "\t\tEmail: " << email << endl;
+
+        string temp;
+        cout << endl
+             << "Type 0 to return: ";
+        cin >> temp;
+    }
+
+};
