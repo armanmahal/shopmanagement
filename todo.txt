@@ -1,1 +1,7 @@
-1> hash the stored passwrod for admin access
+1> hash the stored passwrod for admin access [DONE]
+
+2> User Accounts and Authentication:
+
+User Registration/Login: Allow users to create accounts and log in. This can help in tracking individual user activity and preferences.
+
+Password Recovery: Implement a password recovery feature for users who forget their passwords.
