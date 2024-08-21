@@ -10,8 +10,9 @@ private:
     string correctPassword; // correct password
     string userPassword;    // password which user gave as input
 
-    string name, email;
+    string name, email; // user details
 
+    // Function to hash Password:
     string hashPass(string s)
     {
         unsigned long long int hash = 0;
@@ -44,7 +45,8 @@ private:
         */
     }
 
-    void createUser()
+    // Function to create a New Admin:
+    void createAdmin()
     {
         textRed("\t\tNo Prior Admin Found.");
         textGreen("\tEnter details below to become one:");
@@ -66,18 +68,20 @@ private:
 
 public:
 
+    // Function to authenticate Admin:
     bool authenticate()
     {
-        ifstream passkeyFile("db/auth.txt");
+        // Opening admin database file:
+        ifstream passkeyFile("db/admin.txt");
         if (!passkeyFile)
         {
-            // if file not found:
+            // IF ADMIN FILE NOT FOUNT:
 
             // create a new admin:
-            createUser();
+            createAdmin();
 
             // create a new file:
-            ofstream tempFile("db/auth.txt");
+            ofstream tempFile("db/admin.txt");
             tempFile << "adminname:password:email:";
 
             // enter new admin details in file:
@@ -90,15 +94,17 @@ public:
             return true;
         }
 
-        // if admin file found
 
-        // getting admin Details:
+        // IF ADMIN FILE FOUND:
+
+        // getting admin Details From File:
+
         string details = "";
-        getline(passkeyFile, details); // skip this line
+        getline(passkeyFile, details); // skip this first placeholder line
         getline(passkeyFile, details); // this line contains details.
+
         // setting admin Details in variables:
         int index = 0;
-
         for (auto c : details)
         {
             if (c == ':')
@@ -148,6 +154,7 @@ public:
         }
     }
 
+    // Function to display Details of Admin:
     void displayDetails()
     {
         cout << "\t\tName: " << name << endl;
