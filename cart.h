@@ -1,7 +1,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <iomanip>
-#include "bill.h"
+#include "bills.h"
 
 using namespace std;
 
