@@ -2,6 +2,8 @@
 #include <fstream>
 #include <string>
 
+#include "errorHandling.h"
+
 using namespace std;
 
 class Admin
@@ -67,16 +69,16 @@ private:
     }
 
 public:
-
     // Function to authenticate Admin:
-    bool authenticate()
+    void authenticate()
     {
         // Opening admin database file:
         ifstream passkeyFile("db/admin.txt");
+
+        // IF ADMIN FILE NOT FOUND:
+
         if (!passkeyFile)
         {
-            // IF ADMIN FILE NOT FOUNT:
-
             // create a new admin:
             createAdmin();
 
@@ -91,9 +93,7 @@ public:
             // close the files and return:
             tempFile.close();
             passkeyFile.close();
-            return true;
-        }
-
+                }
 
         // IF ADMIN FILE FOUND:
 
@@ -130,27 +130,17 @@ public:
 
         // getting user input password:
         cout << endl;
-        textGreen("Enter the Passkey for Admin: ", false);
+        cout << "Enter the Passkey for Admin: ";
         cin >> userPassword;
 
         // hashing user input password:
         userPassword = hashPass(userPassword);
 
-        // if password entered is correct:
-        if (correctPassword == userPassword)
+        // if password entered is incorrect:
+        if (correctPassword != userPassword)
         {
-            ScreenClear();
-            cout << endl;
-            textGreen("Success!");
-            textAnimate("Loading...", 60);
-            return true;
-        }
-        // else if not correct password:
-        else
-        {
-            textRed("Wrong Password!");
-            ScreenWaitMilliSec(600);
-            return false;
+            customError e("Wrong Password!");
+            throw e;
         }
     }
 
@@ -159,11 +149,5 @@ public:
     {
         cout << "\t\tName: " << name << endl;
         cout << "\t\tEmail: " << email << endl;
-
-        string temp;
-        cout << endl
-             << "Type 0 to return: ";
-        cin >> temp;
     }
-
 };

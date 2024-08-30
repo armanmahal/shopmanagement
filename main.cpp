@@ -3,7 +3,7 @@
 #include <filesystem>
 
 #include "screenUtil.h"
-#include "auth.h"
+#include "admin.h"
 #include "inventory.h"
 #include "cart.h"
 // #include "errorHandling.h"
@@ -16,9 +16,19 @@ void adminDashboard()
 
     // AUTHENTICATING ADMIN
     Admin admin;
-    bool auth = admin.authenticate();
-    if (!auth)
+    try
+    {
+        admin.authenticate();
+        ScreenClear();
+        cout << endl;
+        textGreen("Success!");
+        textAnimate("Loading...", 60);
+    }
+    catch (customError e)
+    {
+        e.what();
         return;
+    }
 
     // INITIALISING INVENTORY FROM DATABASE:
     Inventory i;
@@ -162,6 +172,11 @@ void adminDashboard()
             try
             {
                 admin.displayDetails();
+
+                string temp;
+                cout << endl
+                     << "Type 0 to return: ";
+                cin >> temp;
             }
             catch (customError e)
             {
