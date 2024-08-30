@@ -6,6 +6,7 @@
 #include "auth.h"
 #include "inventory.h"
 #include "cart.h"
+// #include "errorHandling.h"
 
 using namespace std;
 
@@ -19,9 +20,12 @@ void adminDashboard()
     if (!auth)
         return;
 
-    // INITIALISING INVENTORY:
+    // INITIALISING INVENTORY FROM DATABASE:
     Inventory i;
-    i.initialize();
+    InventoryFileHandling inventoryFile("db/inventory.txt");
+    inventoryFile.loadInventory(i);
+    textGreen("Inventory database Loaded!");
+    ScreenWaitMilliSec(500);
 
     Bills b;
 
@@ -48,31 +52,137 @@ void adminDashboard()
         cout << " ";
         cin >> choice;
 
+        // variables to store any user input:
+        string name;
+        int quantity, price;
+
         switch (choice)
         {
+
         case '1':
-            i.display();
+            try
+            {
+                i.display();
+                textBlink("Type 0 to Dismiss -> ", false);
+                string s;
+                cin >> s;
+            }
+            catch (customError e)
+            {
+                e.what();
+            }
             break;
+
         case '2':
-            i.addItem();
+            // getting details of the items to add:
+            cout << "Name: ";
+            cin >> name;
+            cout << "Price: $";
+            cin >> price;
+            cout << "Quantity: ";
+            cin >> quantity;
+            try
+            {
+                i.addItem(name, quantity, price);
+                textGreen("Item SuccessFully Added.");
+                ScreenWaitMilliSec(700);
+            }
+            catch (customError e)
+            {
+                e.what();
+            }
+
             break;
+
         case '3':
-            i.addToExisting();
+            cout << "Enter the Name of Item: ";
+            cin >> name;
+            cout << "Enter the Quantity to Add: ";
+            cin >> quantity;
+            try
+            {
+                i.addToExisting(name, quantity);
+                textGreen("Item Successfully Updated!");
+                ScreenWaitMilliSec(700);
+            }
+            catch (customError e)
+            {
+                e.what();
+            }
+
             break;
+
         case '4':
-            i.updatePrice();
+            cout << "Enter the Name of Item: ";
+            cin >> name;
+            cout << "Enter the New Price: ";
+            cin >> price;
+            try
+            {
+                i.updatePrice(name, price);
+                textGreen("Price Successfully Updated!");
+                ScreenWaitMilliSec(700);
+            }
+            catch (customError e)
+            {
+                e.what();
+            }
+
             break;
+
         case '5':
-            i.removeItem();
+            cout << "Enter the Name of Item to Delete: ";
+            cin >> name;
+            try
+            {
+                i.removeItem(name);
+                textGreen("Item Successfully Deleted!");
+                ScreenWaitMilliSec(700);
+            }
+            catch (customError e)
+            {
+                e.what();
+            }
+
             break;
+
         case '6':
-            b.displayAllBills();
+            try
+            {
+                b.displayAllBills();
+            }
+            catch (customError e)
+            {
+                e.what();
+            }
+
             break;
+
         case '7':
-            admin.displayDetails();
-            return;
+            try
+            {
+                admin.displayDetails();
+            }
+            catch (customError e)
+            {
+                e.what();
+            }
+
+            break;
+
         case '8':
+            // Save the updated inventory back to the file
+            try
+            {
+                inventoryFile.saveInventory(i);
+            }
+            catch (customError e)
+            {
+                e.what();
+            }
+
             return;
+
         default:
             textRed("Please Enter A Valid Choice!");
             ScreenWaitMilliSec(500);
@@ -85,8 +195,12 @@ void shop()
 {
     Cart cart;
 
-    Inventory inventory;
-    inventory.initialize();
+    // INITALISING AN INVENTORY OBJECT WITH ITEMS FROM DATABASE:
+    Inventory i;
+    InventoryFileHandling inventoryFile("db/inventory.txt");
+    inventoryFile.loadInventory(i);
+    textGreen("Inventory database Loaded!");
+    ScreenWaitMilliSec(500);
 
     while (true)
     {
@@ -112,19 +226,21 @@ void shop()
         switch (choice)
         {
         case '1':
-            inventory.display();
+            i.display();
             break;
         case '2':
             cart.display();
             break;
         case '3':
-            cart.addItem(inventory);
+            cart.addItem(i);
             break;
         case '4':
             cart.deleteItem();
             break;
         case '5':
-            cart.createBill(inventory);
+            cart.createBill(i);
+            // Save the updated inventory back to the file
+            inventoryFile.saveInventory(i);
             return;
         case '6':
             return;
