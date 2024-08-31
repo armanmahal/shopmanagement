@@ -182,7 +182,7 @@ void adminDashboard()
             {
                 e.what();
             }
-            
+
             break;
 
         case '8':
@@ -238,27 +238,101 @@ void shop()
         cout << " ";
         cin >> choice;
 
+        // variables to store any user input:
+        string name;
+        int quantity;
+
         switch (choice)
         {
+
         case '1':
-            i.display();
+            try
+            {
+                i.display();
+                textBlink("Type 0 to Dismiss -> ", false);
+                string s;
+                cin >> s;
+            }
+            catch (customError e)
+            {
+                e.what();
+            }
             break;
+
         case '2':
-            cart.display();
+            try
+            {
+                cart.display();
+                textBlink("Type 0 to Dismiss -> ", false);
+                string s;
+                cin >> s;
+            }
+            catch (customError e)
+            {
+                e.what();
+            }
+
             break;
+
         case '3':
-            cart.addItem(i);
+            cout << "Item to Buy: ";
+            cin >> name;
+            cout << "Quantity: ";
+            cin >> quantity;
+            try
+            {
+                cart.addItem(i, name, quantity);
+                textGreen("Item Added to Cart.");
+                ScreenWaitMilliSec(500);
+            }
+            catch (customError e)
+            {
+                e.what();
+            }
+
             break;
+
         case '4':
-            cart.deleteItem();
+            cout << "Item to Delete from Cart: ";
+            cin >> name;
+            try
+            {
+                cart.deleteItem(name);
+                textGreen("Item Removed from Cart.");
+                ScreenWaitMilliSec(500);
+            }
+            catch (customError e)
+            {
+                e.what();
+            }
+
             break;
+
         case '5':
-            cart.createBill(i);
-            // Save the updated inventory back to the file
-            inventoryFile.saveInventory(i);
-            return;
+            try
+            {
+                cart.createBill(i);
+                // Save the updated inventory back to the file
+                inventoryFile.saveInventory(i);
+
+                cout << endl;
+                textGreen("Purchase Successful!");
+                cout << endl;
+                textInBox("Thanks for shopping " + name, 2);
+                textBlink("Redirecting to Home page...");
+                ScreenWaitMilliSec(2000);
+                return;
+            }
+            catch (customError e)
+            {
+                e.what();
+            }
+
+            break;
+
         case '6':
             return;
+
         default:
             textRed("Please Enter A Valid Choice!");
             ScreenWaitMilliSec(500);
