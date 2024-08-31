@@ -11,6 +11,7 @@ public:
     {
         this->message = message;
     }
+    
     void what()
     {
         textRed(message);

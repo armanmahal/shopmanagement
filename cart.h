@@ -82,7 +82,7 @@ public:
         items.erase(name);
     }
 
-    void createBill(Inventory& inventory)
+    void createBill(Inventory &inventory)
     {
         // if cart empty:
         if (items.empty())
@@ -102,7 +102,8 @@ public:
         }
 
         cout << endl;
-        cout << "Total Value of Bill is ---> $" << total << endl << endl;
+        cout << "Total Value of Bill is ---> $" << total << endl
+             << endl;
 
         // getting buyer details:
         cout << "GIVE YOUR DETAILS:" << endl;
@@ -113,14 +114,22 @@ public:
         cout << "Phone: ";
         cin >> phone;
 
+        try
+        {
+            // creating the bill and adding to db:
+            Bill b(total, name, phone);
+            BillsFileHandling billFile("db/bills.txt");
+            billFile.saveBill(b);
+        }
+        catch (customError e)
+        {
+            throw e;
+        }
+
         // updating inventory after billing:
         for (auto i : items)
         {
             inventory.decreaseQuantity(i.first, i.second.first);
         }
-
-        // creating the bill and adding to db:
-        Bills b1(total, name, phone);
-        b1.addBillToDb();
     }
 };

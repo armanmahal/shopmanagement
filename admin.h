@@ -66,68 +66,14 @@ private:
 
         textGreen("Congrats!!! You became admin of this store.");
         ScreenWaitMilliSec(800);
+
+        ScreenClear();
     }
 
 public:
     // Function to authenticate Admin:
     void authenticate()
     {
-        // Opening admin database file:
-        ifstream passkeyFile("db/admin.txt");
-
-        // IF ADMIN FILE NOT FOUND:
-
-        if (!passkeyFile)
-        {
-            // create a new admin:
-            createAdmin();
-
-            // create a new file:
-            ofstream tempFile("db/admin.txt");
-            tempFile << "adminname:password:email:";
-
-            // enter new admin details in file:
-            tempFile << "\n"
-                     << name << ":" << correctPassword << ":" << email << ":";
-
-            // close the files and return:
-            tempFile.close();
-            passkeyFile.close();
-                }
-
-        // IF ADMIN FILE FOUND:
-
-        // getting admin Details From File:
-
-        string details = "";
-        getline(passkeyFile, details); // skip this first placeholder line
-        getline(passkeyFile, details); // this line contains details.
-
-        // setting admin Details in variables:
-        int index = 0;
-        for (auto c : details)
-        {
-            if (c == ':')
-            {
-                index++;
-            }
-            else
-            {
-                if (index == 0)
-                {
-                    name += c;
-                }
-                if (index == 1)
-                {
-                    correctPassword += c;
-                }
-                if (index == 2)
-                {
-                    email += c;
-                }
-            }
-        }
-
         // getting user input password:
         cout << endl;
         cout << "Enter the Passkey for Admin: ";
@@ -149,5 +95,95 @@ public:
     {
         cout << "\t\tName: " << name << endl;
         cout << "\t\tEmail: " << email << endl;
+    }
+
+    friend class AdminFileHandling;
+};
+
+class AdminFileHandling
+{
+private:
+    string fileLocation;
+
+    // function to check if a file exists or not:
+    bool fileExists()
+    {
+        ifstream file(fileLocation);
+        return file.good(); // Checks if the file stream is in a good state (i.e., file exists)
+    }
+
+public:
+    // constructor:
+    AdminFileHandling(string s)
+    {
+        fileLocation = s;
+    }
+
+    // function to load admin from database:
+    void loadAdmin(Admin &admin)
+    {
+        if (!fileExists())
+        {
+            // create new file:
+            ofstream tempFile(fileLocation);
+            tempFile << "name:password:email";
+            tempFile.close();
+            // create new admin:
+            admin.createAdmin();
+            // save the admin to file:
+            saveAdmin(admin);
+            return;
+        }
+
+        // getting admin Details From File:
+        ifstream adminFile(fileLocation);
+        string details = "";
+        getline(adminFile, details); // skip this first placeholder line
+        getline(adminFile, details); // this line contains details.
+
+        // setting admin Details in variables:
+        int index = 0;
+        for (auto c : details)
+        {
+            if (c == ':')
+            {
+                index++;
+            }
+            else
+            {
+                if (index == 0)
+                {
+                    admin.name += c;
+                }
+                if (index == 1)
+                {
+                    admin.correctPassword += c;
+                }
+                if (index == 2)
+                {
+                    admin.email += c;
+                }
+            }
+        }
+    }
+
+    // function to save admin to database:
+    void saveAdmin(Admin admin)
+    {
+        if (!fileExists())
+        {
+            customError e("Admin File Not Found in Database!");
+            throw e;
+        }
+
+        // overwriting the file with changed admin details:
+        ofstream tempFile(fileLocation);
+        tempFile << "adminname:password:email:";
+        // enter new admin details in file:
+        tempFile << "\n"
+                 << admin.name << ":" << admin.correctPassword << ":" << admin.email << ":";
+
+        // close the file:
+        tempFile.close();
     }
 };

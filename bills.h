@@ -3,59 +3,102 @@
 #include <iomanip>
 using namespace std;
 
-class Bills
+class Bill
 {
 private:
-    int total;
-    string person;
-    string phone;
-    string billsLocation = "db/bills.txt";
-
-    // function to check if a file exists or not:
-    bool fileExists(string fileName)
-    {
-        ifstream file(fileName);
-        return file.good(); // Checks if the file stream is in a good state (i.e., file exists)
-    }
+    int amount;
+    string buyer;
+    string contact;
 
 public:
     // default constructor:
-    Bills() {}
+    Bill() {}
+
     // constructor:
-    Bills(int total, string person, string phone)
+    Bill(int amount, string buyer, string contact)
     {
-        this->total = total;
-        this->person = person;
-        this->phone = phone;
+        this->amount = amount;
+        this->buyer = buyer;
+        this->contact = contact;
     }
 
-    // displaying all bills from db file:
+    friend class BillsFileHandling;
+};
+
+class AllBills
+{
+private:
+    vector<vector<string>> bills;
+
+public:
+    // displaying all bills :
     void displayAllBills()
     {
-
-        // if not exists:
-        if (!fileExists(billsLocation))
+        // if no bill found:
+        if (bills.empty())
         {
-            cout << endl
-                 << "\t\t   ";
-            textRed("No Bills Found!");
-            ScreenWaitMilliSec(700);
-            return;
+            customError e("No Bills Found!");
+            throw e;
         }
 
-        ifstream file(billsLocation);
-
-        // displaying board:
         cout << endl;
         cout << left; // text align left
         cout << setw(20) << "Buyer" << setw(10) << "Amount" << setw(10) << "Contact" << endl;
 
+        for (auto bill : bills)
+        {
+            cout << left;
+            cout
+                << setw(20) << setfill('_') << bill[0] << setw(10) << '$' + bill[1] << setw(10) << setfill(' ') << bill[2] << endl;
+        }
+
+        cout << right; // reset text align
+        cout << endl;
+        textBlink("Type 0 to Dismiss -> ", false);
+        string s;
+        cin >> s;
+    }
+
+    friend class BillsFileHandling;
+};
+
+class BillsFileHandling
+{
+private:
+    string fileLocation;
+
+    // function to check iffile exists or not:
+    bool fileExists()
+    {
+        ifstream file(fileLocation);
+        return file.good(); // Checks if the file stream is in a good state (i.e., file exists)
+    }
+
+public:
+    // constructor:
+    BillsFileHandling(string s)
+    {
+        fileLocation = s;
+    }
+
+    // loading all bills from file:
+    void loadAllBills(AllBills &b)
+    {
+        // if not exists:
+        if (!fileExists())
+        {
+            return;
+        }
+
+        // reading bills from file:
+
+        ifstream billsFile(fileLocation);
         bool skip = true;
-        while (file.eof() == false)
+        while (billsFile.eof() == false)
         {
 
             string line = "", s1 = "", s2 = "", s3 = "";
-            getline(file, line);
+            getline(billsFile, line);
 
             // skipping first line to print
             if (skip)
@@ -85,31 +128,25 @@ public:
                     s3 += i;
                 }
             }
-            cout << left;
-            cout
-                << setw(20) << setfill('_') << s1 << setw(10) << '$' + s2 << setw(10) << setfill(' ') << s3 << endl;
+            vector<string> temp = {s1, s2, s3};
+            b.bills.push_back(temp);
         }
-
-        cout << right; // reset text align
-        cout << endl;
-        textBlink("Type 0 to Dismiss -> ", false);
-        string s;
-        cin >> s;
     }
 
-    void addBillToDb()
+    // saving a bill to file:
+    void saveBill(Bill b)
     {
-        // checking if file exists:
-        if (!fileExists(billsLocation))
+        // create bill file if not exists:
+        if (!fileExists())
         {
-            ofstream file(billsLocation);
+            ofstream file(fileLocation);
             file << "Buyer:Amount:Contact:";
             file.close();
         }
 
         // adding to db:
-        ofstream file(billsLocation, ios::app); // opening in append mode
-        file << '\n' + person + ':' + to_string(total) + ':' + phone + ':';
+        ofstream file(fileLocation, ios::app); // opening in append mode
+        file << '\n' + b.buyer + ':' + to_string(b.amount) + ':' + b.contact + ':';
         file.close();
     }
 };

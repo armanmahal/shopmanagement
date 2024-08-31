@@ -16,6 +16,8 @@ void adminDashboard()
 
     // AUTHENTICATING ADMIN
     Admin admin;
+    AdminFileHandling adminFile("db/admin.txt");
+    adminFile.loadAdmin(admin);
     try
     {
         admin.authenticate();
@@ -37,7 +39,9 @@ void adminDashboard()
     textGreen("Inventory database Loaded!");
     ScreenWaitMilliSec(500);
 
-    Bills b;
+    AllBills b;
+    BillsFileHandling billFile("db/bills.txt");
+    billFile.loadAllBills(b);
 
     while (true)
     {
@@ -157,6 +161,7 @@ void adminDashboard()
             break;
 
         case '6':
+
             try
             {
                 b.displayAllBills();
@@ -186,10 +191,11 @@ void adminDashboard()
             break;
 
         case '8':
-            // Save the updated inventory back to the file
+            // Save the updated inventory + admindetails back to the file
             try
             {
                 inventoryFile.saveInventory(i);
+                adminFile.saveAdmin(admin);
             }
             catch (customError e)
             {
@@ -326,9 +332,8 @@ void shop()
             catch (customError e)
             {
                 e.what();
+                break;
             }
-
-            break;
 
         case '6':
             return;
