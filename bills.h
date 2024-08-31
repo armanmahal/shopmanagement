@@ -90,6 +90,8 @@ public:
             return;
         }
 
+        // clearing the former billsList to add new:
+        b.bills.clear();
         // reading bills from file:
 
         ifstream billsFile(fileLocation);

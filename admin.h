@@ -85,6 +85,8 @@ public:
         // if password entered is incorrect:
         if (correctPassword != userPassword)
         {
+            cout<<correctPassword<<" incorrect " <<userPassword<<endl;
+            ScreenWaitSec(100);
             customError e("Wrong Password!");
             throw e;
         }
@@ -143,6 +145,7 @@ public:
 
         // setting admin Details in variables:
         int index = 0;
+        string s1,s2,s3;
         for (auto c : details)
         {
             if (c == ':')
@@ -153,18 +156,19 @@ public:
             {
                 if (index == 0)
                 {
-                    admin.name += c;
+                    s1 += c;
                 }
                 if (index == 1)
                 {
-                    admin.correctPassword += c;
+                    s2 += c;
                 }
                 if (index == 2)
                 {
-                    admin.email += c;
+                    s3 += c;
                 }
             }
         }
+        admin.name = s1; admin.correctPassword = s2; admin.email =s3;
     }
 
     // function to save admin to database:

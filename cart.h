@@ -34,6 +34,10 @@ public:
         cout << endl;
     }
 
+    void clear(){
+        items.clear();
+    }
+
     void addItem(Inventory i, string name, int quantity)
     {
         // if item doesnt exists:
