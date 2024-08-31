@@ -36,7 +36,7 @@ int main()
         char choice;
         textInBox("Main Menu", 3);
         cout << R"(
-            Welcome To Super Market Billing System
+            Welcome To Shop Management System
             **************************************
 
                       1. Admin Access.
